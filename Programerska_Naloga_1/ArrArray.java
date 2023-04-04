@@ -3,43 +3,52 @@ package Programerska_Naloga_1;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ArrArray {
     // Tabela tabel
-    private int[][] table;
+    private ArrayElement[][] table;
+    private int[][] deleted;
     static private int k = 1;
     private int[] subtable_index;
 
     public ArrArray() {
-        this.table = new int[k][];
+        this.table = new ArrayElement[k][];
+        this.deleted = new int[k][];
         this.subtable_index = new int[k];
-        for (int i = 0; i < k; i++) {
-
-        }
     }
 
     public void insert(int e) {
         // Temp table
-        int[] temp = new int[1];
-        temp[0] = e;
+        ArrayElement[] temp = new ArrayElement[1];
+        temp[0] = new ArrayElement(e);
 
         // Insert the element into the table
         for (int i = 0; i < k; i++) {
             if (table[i] == null) {
-                table[i] = new int[(int) Math.pow(2, i)];
+                table[i] = new ArrayElement[(int) Math.pow(2, i)];
+                deleted[i] = new int[(int) Math.pow(2, i)];
             }
             // If the subtable is empty merge temp and all previous subtables and sort
             if (subtable_index[i] == 0) {
                 emptyMerge(i, temp);
                 return;
-            } else if (subtable_index[i] == (int) Math.pow(2, i)) {
-                if (i == k - 1) {
+            }
+            // If the subtable if full and has any elements deleted just insert where the
+            // element was deleted
+            else if (subtable_index[i] == (int) Math.pow(2, i)) {
+                if (Arrays.stream(deleted[i]).sum() > 0) {
+                    int insert_place = findIndex(deleted[i], 1);
+                    table[i][insert_place] = temp[0];
+                    deleted[i][insert_place] = 0;
+                    return;
+                }
+
+                else if (i == k - 1) {
                     resize();
                     if (table[i + 1] == null) {
                         table[i + 1] = new int[(int) Math.pow(2, i + 1)];
+                        deleted[i + 1] = new int[(int) Math.pow(2, i + 1)];
                     }
                     emptyMerge(i + 1, temp);
                     return;
@@ -52,6 +61,15 @@ public class ArrArray {
                 return;
             }
         }
+    }
+
+    public static int findIndex(int[] arr, int e) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == e) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private void nonEmptyMerge(int i, int[] temp) {
@@ -75,17 +93,71 @@ public class ArrArray {
         return IntStream.concat(Arrays.stream(array1), Arrays.stream(array2)).toArray();
     }
 
-    public boolean find(int e) {
-        return false;
+    private int[] exists(int e) {
+        for (int i = 0; i < k; i++) {
+            if (subtable_index[i] == 0) {
+                continue;
+            } else {
+                // If e is the min of the subtable
+                if (e == table[i][0] && deleted[i][0] != 1) {
+                    return new int[] { i, 0 };
+                }
+                // If e is the max of the subtable
+                else if (e == table[i][subtable_index[i] - 1] && deleted[i][subtable_index[i] - 1] != 1) {
+                    return new int[] { i, subtable_index[i] - 1 };
+                }
+                // If e is not in the sorted subtable
+                else if (e < table[i][0] || e > table[i][subtable_index[i] - 1]) {
+                    continue;
+                }
+                // Else e must be in the subtable and we perform the binary search to find it
+                else {
+                    int j = binarySearch(table[i], e);
+                    if (deleted[i][j] != 1) {
+                        return new int[] { i, j };
+                    }
+                }
+            }
+        }
+        return new int[0];
     }
 
-    public boolean delete(int e) {
-        return false;
+    public boolean find(int e) {
+        int[] exist = exists(e);
+        if (exist.length == 0) {
+            System.out.println("false");
+            return false;
+        }
+        System.out.println("true");
+        return true;
+    }
+
+    private int binarySearch(int[] table, int e) {
+        int i = 0;
+        int j = table.length - 1;
+        while (e != table[(i + j) / 2]) {
+            if (e > table[(i + j) / 2]) {
+                i = (i + j) / 2;
+            } else {
+                j = (i + j) / 2;
+            }
+        }
+
+        return (i + j) / 2;
+    }
+
+    public void delete(int e) {
+        int[] index = exists(e);
+        if (index.length == 0) {
+            System.out.println("false");
+            return;
+        }
+        deleted[index[0]][index[1]] = 1;
+        System.out.println("true");
     }
 
     public void printOut() {
-        IntStream stream = Arrays.stream(subtable_index);
-        if (stream.sum() == 0) {
+        if (Arrays.stream(subtable_index).sum() == 0) {
             System.out.println("empty");
             return;
         }
@@ -95,17 +167,24 @@ public class ArrArray {
                 System.out.println("A_" + i + ": ...");
             } else {
                 System.out.print("A_" + i + ":");
-                stream = Arrays.stream(table[i]);
-                Map<Integer, Long> count = stream.boxed()
-                        .collect(Collectors.groupingBy(Function.identity(), TreeMap::new, Collectors.counting()));
-
+                ;
+                Map<Integer, Integer> count = new TreeMap<>();
+                for (int j = 0; j < table[i].length; j++) {
+                    if (deleted[i][j] == 0) {
+                        int element = table[i][j];
+                        count.put(element, count.getOrDefault(element, 0) + 1);
+                    }
+                }
                 final int[] index = { 0 };
-                int last = count.size() - 1;
+                int last = subtable_index[i] - 1;
+                int[] deleted_i = deleted[i];
                 count.forEach((key, value) -> {
                     if (index[0] == last) {
-                        System.out.print(" " + key + "/" + value);
+                        System.out.print(" " + (deleted_i[index[0]] == 1 ? "x" : key) + "/"
+                                + (deleted_i[index[0]] == 1 ? value - 1 : value));
                     } else {
-                        System.out.print(" " + key + "/" + value + ",");
+                        System.out.print(" " + (deleted_i[index[0]] == 1 ? "x" : key) + "/"
+                                + (deleted_i[index[0]] == 1 ? value - 1 : value) + ",");
                     }
                     index[0]++;
                 });
@@ -114,19 +193,80 @@ public class ArrArray {
         }
     }
 
+    // public void printOut() {
+    // IntStream stream = Arrays.stream(subtable_index);
+    // if (stream.sum() == 0) {
+    // System.out.println("empty");
+    // return;
+    // }
+
+    // for (int i = 0; i < k; i++) {
+    // if (subtable_index[i] == 0) {
+    // System.out.println("A_" + i + ": ...");
+    // } else {
+    // System.out.print("A_" + i + ":");
+    // stream = Arrays.stream(table[i]);
+    // int[] deletedRow = deleted[i];
+    // Map<Integer, Long> count = stream.filter(e -> deletedRow[e] == 0)
+    // .boxed()
+    // .collect(Collectors.groupingBy(Function.identity(), TreeMap::new,
+    // Collectors.counting()));
+
+    // final int[] index = { 0 };
+    // int last = count.size() - 1;
+    // count.forEach((key, value) -> {
+    // if (deletedRow[key] == 1) {
+    // if (index[0] == last) {
+    // System.out.print(" x");
+
+    // } else {
+    // System.out.print(" x,");
+    // return;
+    // }
+    // }
+    // if (index[0] == last) {
+    // System.out.print(" " + key + "/" + value);
+    // } else {
+    // System.out.print(" " + key + "/" + value + ",");
+    // }
+    // index[0]++;
+    // });
+    // System.out.println();
+    // }
+    // }
+    // }
+
     private void resize() {
         int newK = k + 1; // Compute new size of first dimension
-        int[][] newTable = new int[newK][]; // Create new array with the new size
+        ArrayElement[][] newTable = new ArrayElement[newK][]; // Create new array with the new size
+        int[][] newDeleted = new int[newK][];
         int[] new_subtable_index = new int[newK];
-        // Copy existing data into the new array
+
         for (int i = 0; i < k; i++) {
             newTable[i] = Arrays.copyOf(table[i], table[i].length);
+            newDeleted[i] = Arrays.copyOf(deleted[i], deleted[i].length);
             new_subtable_index[i] = subtable_index[i];
         }
 
-        // Update the reference to the old array with the new one, and the k value
         this.table = newTable;
         this.subtable_index = new_subtable_index;
+        this.deleted = newDeleted;
         k = newK;
+    }
+}
+
+class ArrayElement implements Comparable<ArrayElement> {
+    public int integer;
+    public long count;
+
+    public ArrayElement(int e) {
+        this.integer = e;
+        this.count = 1;
+    }
+
+    public int compareTo(ArrayElement a) {
+        if(this.integer < a.integer) return -1;
+        else if(this.integer == a.integer) return 0;
+        else return 1;
     }
 }
