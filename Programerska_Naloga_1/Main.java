@@ -14,9 +14,14 @@ public class Main {
         tbl.delete(15);
         tbl.insert(11);
         tbl.delete(5);
+        tbl.delete(11);
+        tbl.insert(22);
+        tbl.insert(33);
+        tbl.insert(12);
+        tbl.insert(9);
         tbl.printOut();
-        tbl.find(7);
-        tbl.find(5);
+        tbl.find(11);
+        tbl.find(9);
         tbl.find(42);
     }
 }

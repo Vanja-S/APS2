@@ -1,9 +1,6 @@
 package Programerska_Naloga_1;
 
 import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class ArrArray {
@@ -120,6 +117,7 @@ public class ArrArray {
                 // Else e must be in the subtable and we perform the binary search to find it
                 else {
                     int j = binarySearch(table[i], e);
+                    if(j == -1) return new int[0];
                     if (deleted[i][j] != 1) {
                         return new int[] { i, j };
                     }
@@ -142,15 +140,17 @@ public class ArrArray {
     private int binarySearch(ArrayElement[] table, ArrayElement e) {
         int i = 0;
         int j = table.length - 1;
-        while (e.compareTo(table[(i + j) / 2]) != 0) {
-            if (e.compareTo(table[(i + j) / 2]) > 0) {
-                i = (i + j) / 2;
+        while (i <= j) {
+            int mid = (i + j) / 2;
+            if (table[mid].compareTo(e) == 0) {
+                return mid;
+            } else if (table[mid].compareTo(e) < 0) {
+                i = mid + 1;
             } else {
-                j = (i + j) / 2;
+                j = mid - 1;
             }
         }
-
-        return (i + j) / 2;
+        return -1;
     }
 
     public void delete(int e) {
@@ -194,49 +194,6 @@ public class ArrArray {
             }
         }
     }
-
-    // public void printOut() {
-    // IntStream stream = Arrays.stream(subtable_index);
-    // if (stream.sum() == 0) {
-    // System.out.println("empty");
-    // return;
-    // }
-
-    // for (int i = 0; i < k; i++) {
-    // if (subtable_index[i] == 0) {
-    // System.out.println("A_" + i + ": ...");
-    // } else {
-    // System.out.print("A_" + i + ":");
-    // stream = Arrays.stream(table[i]);
-    // int[] deletedRow = deleted[i];
-    // Map<Integer, Long> count = stream.filter(e -> deletedRow[e] == 0)
-    // .boxed()
-    // .collect(Collectors.groupingBy(Function.identity(), TreeMap::new,
-    // Collectors.counting()));
-
-    // final int[] index = { 0 };
-    // int last = count.size() - 1;
-    // count.forEach((key, value) -> {
-    // if (deletedRow[key] == 1) {
-    // if (index[0] == last) {
-    // System.out.print(" x");
-
-    // } else {
-    // System.out.print(" x,");
-    // return;
-    // }
-    // }
-    // if (index[0] == last) {
-    // System.out.print(" " + key + "/" + value);
-    // } else {
-    // System.out.print(" " + key + "/" + value + ",");
-    // }
-    // index[0]++;
-    // });
-    // System.out.println();
-    // }
-    // }
-    // }
 
     private void resize() {
         int newK = k + 1; // Compute new size of first dimension
