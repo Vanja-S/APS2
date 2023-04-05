@@ -164,6 +164,17 @@ public class ArrArray {
         }
         if (--table[index[0]][index[1]].count == 0)
             table[index[0]][index[1]].isDeleted = true;
+        // Check if the subtable is the last one and completely empty
+        for(int i = k - 1; i >= 0; i--) {
+            if(Arrays.stream(table[i])
+                .noneMatch(el -> !el.isDeleted) || subtable_index[i] == 0) {
+                    subtable_index[i] = 0;
+                    k--;
+                }
+            else {
+                break;
+            }
+        }
         System.out.println("true");
     }
 
