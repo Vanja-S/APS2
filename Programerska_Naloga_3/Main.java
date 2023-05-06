@@ -22,25 +22,14 @@ public class Main {
         bh.printComparisons();
         bh.deleteMin();
         bh.printElements();
-        bh.printComparisons();
+        bh.deleteMin();
+        bh.printElements();
+        bh.deleteMin();
+        bh.deleteMin();
+        bh.deleteMin();
+        bh.printElements();
         bh.deleteMin();
         bh.printElements();
         bh.printComparisons();
-        bh.deleteMin();
-        bh.printElements();
-        bh.printComparisons();
-        bh.deleteMin();
-        bh.printElements();
-        bh.printComparisons();
-        bh.deleteMin();
-        bh.printElements();
-        bh.printComparisons();
-        // bh.deleteMin();
-        // bh.deleteMin();
-        // bh.deleteMin();
-        // bh.printElements();
-        // bh.deleteMin();
-        // bh.printElements();
-        // bh.printComparisons();
     }
 }

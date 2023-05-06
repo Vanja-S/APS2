@@ -37,19 +37,41 @@ public class binheap {
         }
     }
 
+    private boolean compareMoreThan3(int left, int right) {
+        return heap[left] <= heap[right];
+    }
+
+    private int compareOther(int leftChildIndex, int rightChildIndex, int minIndex) {
+        if(leftChildIndex < size) {
+            comparisons++;
+            if (heap[leftChildIndex] < heap[minIndex]) {
+                return leftChildIndex;
+            }
+        }
+
+        if(rightChildIndex < size) {
+            comparisons++;
+            if (heap[rightChildIndex] < heap[minIndex]) {
+                return rightChildIndex;
+            }
+        }
+
+        return minIndex;
+    }
+
     private void siftDown(int index) {
         int leftChildIndex = 2 * index + 1;
         int rightChildIndex = 2 * index + 2;
         int minIndex = index;
 
-        if (leftChildIndex < size && heap[leftChildIndex] < heap[minIndex]) {
+        if (index == 0 && size >= 3) {
             comparisons++;
-            minIndex = leftChildIndex;
-        }
-
-        if (rightChildIndex < size && heap[rightChildIndex] < heap[minIndex]) {
-            comparisons++;
-            minIndex = rightChildIndex;
+            if (compareMoreThan3(leftChildIndex, rightChildIndex))
+                minIndex = leftChildIndex;
+            else
+                minIndex = rightChildIndex;
+        } else {
+            minIndex = compareOther(leftChildIndex, rightChildIndex, minIndex);
         }
 
         if (minIndex != index) {
