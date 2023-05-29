@@ -1,7 +1,10 @@
 package Programerska_Naloga_4;
 
-public class Main {
+public class testi {
+    Bi lahko kdo ki je dobil 10 tock 4 nalogo sprobal te teste :
+public class Naloga4 {
     public static void main(String[] args) {
+
         // TEST 1
         System.out.println("TEST1");
         bst b = new bst();
@@ -18,7 +21,7 @@ public class Main {
         b.printPostOrder();
         b.printComparisons();
 
-        // TEST 2
+//TEST 2
         System.out.println();
         System.out.println("TEST2");
         bst b2 = new bst();
@@ -41,7 +44,7 @@ public class Main {
         b2.printInOrder();
         b2.printComparisons();
         System.out.println("TEST3");
-        // TEST 3
+//TEST 3
         System.out.println();
         bst b3 = new bst();
         b3.insert(19);
@@ -71,7 +74,7 @@ public class Main {
         b.printComparisons();
         System.out.println();
         System.out.println("TEST4");
-        // TEST 4
+//TEST 4
         bst b4 = new bst();
         b4.insert(19);
         b4.insert(19);
@@ -99,7 +102,7 @@ public class Main {
         b.printComparisons();
         System.out.println();
         System.out.println("TEST5");
-        // TEST 5
+//TEST 5
         bst b5 = new bst();
         b5.insert(29);
         b5.insert(15);
@@ -139,4 +142,5 @@ public class Main {
         b6.printPostOrder();
         b.printComparisons();
     }
+}
 }

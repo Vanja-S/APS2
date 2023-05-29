@@ -4,12 +4,14 @@ public class bst {
 
     int size;
     int comparisons;
+    boolean deleted;
     BstElement root;
 
     public bst() {
         size = 0;
         comparisons = 0;
         root = null;
+        deleted = false;
     }
 
     public void insert(int key) {
@@ -69,62 +71,97 @@ public class bst {
     }
 
     public void delete(int key) {
+        deleted = false;
         if (root == null) {
             System.out.println("false");
             return;
         }
 
-        deleteRecursive(key, root, null);
+        deleteRecursive(key, root, null, false);
     }
 
-    private void deleteRecursive(int key, BstElement node, BstElement parentNode) {
+    private void deleteRecursive(int key, BstElement node, BstElement parentNode, boolean dir) {
         if (node == null) {
-            System.out.println("false");
+            if (!deleted)
+                System.out.println("false");
             return;
         }
 
+        if (!deleted)
+            comparisons++;
         if (key == node.data) {
-            System.out.println("true");
+            if (!deleted) {
+                System.out.println("true");
+            }
+            deleted = true;
+
             if (--node.frequency != 0) {
                 return;
             }
+
+            if (node == root) {
+                BstElement max;
+                if(node.left == null && node.right == null) {
+                    root = null;
+                    return;
+                }
+                else if (node.left != null) {
+                    max = maxElement(node.left);
+                    node.data = max.data;
+                    node.frequency = max.frequency;
+                    deleteRecursive(max.data, node.left, node, false);
+                    return;
+                } else {
+                    BstElement min = minElement(node.right);
+                    node.data = min.data;
+                    node.frequency = min.frequency;
+                    deleteRecursive(min.data, node.right, node, true);
+                    return;
+                }
+            }
             // If node is a leaf
-            if (node.left == null & node.right == null) {
-                if (key < parentNode.data)
+            else if (node.left == null & node.right == null) {
+                if(!dir)
                     parentNode.left = null;
-                else if (key > parentNode.data)
+                else 
                     parentNode.right = null;
             }
             // If node has only left child
             else if (node.left != null & node.right == null) {
-                if (key < parentNode.data)
+                if(!dir)
                     parentNode.left = node.left;
-                else if (key > parentNode.data)
+                else 
                     parentNode.right = node.left;
             }
             // If node has only right child
             else if (node.left == null & node.right != null) {
-                if (key < parentNode.data)
+                if(!dir)
                     parentNode.left = node.right;
-                else if (key > parentNode.data)
+                else 
                     parentNode.right = node.right;
             }
             // Else the node has two children
             else {
-                BstElement min = minElement(node.right);
-                node.data = min.data;
-                node.frequency = min.frequency;
-                deleteRecursive(min.data, node.right, node);
+                BstElement max = maxElement(node.left);
+                node.data = max.data;
+                node.frequency = max.frequency;
+                deleteRecursive(max.data, node.left, node, false);
             }
         } else if (key < node.data) {
-            deleteRecursive(key, node.left, node);
+            deleteRecursive(key, node.left, node, false);
         } else if (key > node.data) {
-            deleteRecursive(key, node.right, node);
+            deleteRecursive(key, node.right, node, true);
         }
     }
 
-    private BstElement minElement(BstElement node) {
-        if (node.left == null)
+    private BstElement maxElement(BstElement node) {
+        if (node.right == null)
+            return node;
+        return maxElement(node.right);
+    }
+
+    public BstElement minElement(BstElement node) {
+        if(node.left != null) 
             return node;
         return minElement(node.left);
     }
