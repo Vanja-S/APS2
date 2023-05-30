@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 public class Tests {
-    static bst bst = new bst();
+    static bst_2 bst = new bst_2();
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
 
     @Test

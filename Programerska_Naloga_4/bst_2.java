@@ -1,27 +1,29 @@
-public class bst {
-    static Element root;
+package Programerska_Naloga_4;
+
+public class bst_2 {
+    static BstElement root;
     static int compareCount = 0;
     static boolean kretnica;
 
-    public bst() {
-        bst.root = null;
-        bst.compareCount = 0;
-        bst.kretnica = false;
+    public bst_2() {
+        bst_2.root = null;
+        bst_2.compareCount = 0;
+        bst_2.kretnica = false;
     }
 
     public void insert(int value) {
-        if(bst.root == null) {
-            bst.root = new Element(value);
+        if(bst_2.root == null) {
+            bst_2.root = new BstElement(value);
         } else {
-            bst.root.insert(value);
+            bst_2.root.insert(value);
         }
     }
 
     public void find(int value) {
-        if(bst.root == null) {
+        if(bst_2.root == null) {
             System.out.println("false");
         } else {
-            System.out.println(bst.root.find(value));
+            System.out.println(bst_2.root.find(value));
         }
     }
 
@@ -29,52 +31,52 @@ public class bst {
         if(root == null) {
             System.out.println("false");
         } else {
-            System.out.println(bst.root.delete(value, null));
+            System.out.println(bst_2.root.delete(value, null));
         }
     }
 
     public void printPreOrder() {
-        if(bst.root == null) {
+        if(bst_2.root == null) {
             System.out.println("empty");
         } else {
-            bst.root.printPreOrder();
+            bst_2.root.printPreOrder();
             System.out.println();
         }
     }
 
     public void printInOrder() {
-        if(bst.root == null) {
+        if(bst_2.root == null) {
             System.out.println("empty");
         } else {
-            bst.root.printInOrder();
+            bst_2.root.printInOrder();
             System.out.println();
         }
     }
 
     public void printPostOrder() {
-        if(bst.root == null) {
+        if(bst_2.root == null) {
             System.out.println("empty");
         } else {
-            bst.root.printPostOrder();
+            bst_2.root.printPostOrder();
             System.out.println();
         }
     }
 
     public void printComparisons() {
-        System.out.println("COMPARISONS: " + bst.compareCount);
+        System.out.println("COMPARISONS: " + bst_2.compareCount);
     }
 }
 
-class Element {
+class BstElement {
     private int value;
     public int count;
-    public Element left, right;
+    public BstElement left, right;
 
-    public Element(int value) {
+    public BstElement(int value) {
         this(value, null, null);
     }
 
-    public Element(int value, Element left, Element right) {
+    public BstElement(int value, BstElement left, BstElement right) {
         this.value = value;
         this.left = left;
         this.right = right;
@@ -86,7 +88,7 @@ class Element {
     }
 
     public boolean find(int value) {
-        bst.compareCount++;
+        bst_2.compareCount++;
         if(this.value == value) {
             return true;
         } else {
@@ -99,17 +101,17 @@ class Element {
     }
 
     public void insert(int value) {
-        bst.compareCount++;
+        bst_2.compareCount++;
         if(value > this.value) {
             if(this.right == null) {
-                this.right = new Element(value);
+                this.right = new BstElement(value);
             } else {
                 this.right.insert(value);
             }
 
         } else if(value < this.value) {
             if(this.left == null) {
-                this.left = new Element(value);
+                this.left = new BstElement(value);
             } else {
                 this.left.insert(value);
             }
@@ -119,7 +121,7 @@ class Element {
         }
     }
 
-    public Element getMaxElement(Element parent) {
+    public BstElement getMaxElement(BstElement parent) {
         if(this.right != null) {
             return this.right.getMaxElement(this);
         } else {
@@ -127,7 +129,7 @@ class Element {
         }
     }
 
-    public Element getMinElement(Element parent) {
+    public BstElement getMinElement(BstElement parent) {
         if(this.left != null) {
             return this.left.getMinElement(this);
         } else {
@@ -135,9 +137,9 @@ class Element {
         }
     }
 
-    private void setParent(int currValue, Element parent, Element newValue) {
+    private void setParent(int currValue, BstElement parent, BstElement newValue) {
         if(parent == null) {
-            bst.root = newValue;
+            bst_2.root = newValue;
         } else {
             if(currValue > parent.value()) {
                 parent.right = newValue;
@@ -147,8 +149,8 @@ class Element {
         }
     }
 
-    public boolean delete(int value, Element parent) {
-        bst.compareCount++;
+    public boolean delete(int value, BstElement parent) {
+        bst_2.compareCount++;
         if(value == this.value) {
             if(this.count > 1) {
                 this.count--;
@@ -165,8 +167,8 @@ class Element {
                     break;
 
                 case 2:
-                    if(bst.kretnica == false) {
-                        Element maxElParent = this.left.getMaxElement(this);
+                    if(bst_2.kretnica == false) {
+                        BstElement maxElParent = this.left.getMaxElement(this);
 
                         if(maxElParent == this) {
                             this.left.right = this.right;
@@ -178,10 +180,10 @@ class Element {
                             maxElParent.right = maxElParent.right.left;
                         }
                                                 
-                        bst.kretnica = true;
+                        bst_2.kretnica = true;
                     } else {
 
-                        Element maxElParent = this.right.getMinElement(this);
+                        BstElement maxElParent = this.right.getMinElement(this);
                         if(maxElParent == this) {
                             this.right.left = this.left;
                             setParent(value, parent, maxElParent.right);
@@ -191,7 +193,7 @@ class Element {
 
                             maxElParent.left = maxElParent.left.right;
                         }
-                        bst.kretnica = false;
+                        bst_2.kretnica = false;
                     }
             }
             return true;

@@ -4,13 +4,14 @@ public class bst {
 
     int size;
     int comparisons;
-    boolean deleted;
+    boolean deleteDir, deleted;
     BstElement root;
 
     public bst() {
         size = 0;
         comparisons = 0;
         root = null;
+        deleteDir = false;
         deleted = false;
     }
 
@@ -19,31 +20,25 @@ public class bst {
             root = new BstElement(key);
             return;
         }
-
-        insertRecursive(key, root);
+        insertR(key, root);
     }
 
-    private void insertRecursive(int newKey, BstElement node) {
-        if (newKey < node.data) {
-            comparisons++;
-            if (node.left != null) {
-                insertRecursive(newKey, node.left);
-                return;
+    public void insertR(int key, BstElement node) {
+        comparisons++;
+        if (key > node.data) {
+            if (node.right == null) {
+                node.right = new BstElement(key);
+            } else {
+                insertR(key, node.right);
             }
-            node.left = new BstElement(newKey);
-            return;
-        } else if (newKey > node.data) {
-            comparisons++;
-            if (node.right != null) {
-                insertRecursive(newKey, node.right);
-                return;
+        } else if (key < node.data) {
+            if (node.left == null) {
+                node.left = new BstElement(key);
+            } else {
+                insertR(key, node.left);
             }
-            node.right = new BstElement(newKey);
-            return;
-        } else if (newKey == node.data) {
-            comparisons++;
+        } else {
             node.frequency++;
-            return;
         }
     }
 
@@ -65,7 +60,6 @@ public class bst {
             return findRecursive(key, node.right);
         } else {
             comparisons++;
-            // key == node.data
             return true;
         }
     }
@@ -76,94 +70,181 @@ public class bst {
             System.out.println("false");
             return;
         }
-
-        deleteRecursive(key, root, null, false);
+        System.out.println(delete(key, root, null));
     }
 
-    private void deleteRecursive(int key, BstElement node, BstElement parentNode, boolean dir) {
-        if (node == null) {
-            if (!deleted)
-                System.out.println("false");
-            return;
-        }
+    // private boolean deleteRecursive(int key, BstElement node, BstElement
+    // parentNode, boolean dir) {
+    // if (node == null) {
+    // return false;
+    // }
 
-        if (!deleted)
-            comparisons++;
+    // comparisons++;
+    // if (key == node.data) {
+    // if (!deleted) {
+    // System.out.println("true");
+    // }
+
+    // if (--node.frequency != 0) {
+    // return true;
+    // }
+
+    // if (node == root) {
+    // if (node.left == null && node.right == null) {
+    // root = null;
+    // }
+
+    // else if (!deleteDir) {
+    // BstElement max = maxElement(node);
+    // node.data = max.data;
+    // node.frequency = max.frequency;
+    // deleteRecursive(max.data, node.left, node, false);
+    // deleteDir = true;
+    // } else {
+    // BstElement min = minElement(node);
+    // node.data = min.data;
+    // node.frequency = min.frequency;
+    // deleteRecursive(min.data, node.right, node, false);
+    // deleteDir = false;
+    // }
+    // }
+    // // If node is a leaf
+    // else if (node.left == null & node.right == null) {
+    // if (!dir)
+    // parentNode.left = null;
+    // else
+    // parentNode.right = null;
+    // }
+    // // If node has only left child
+    // else if (node.left != null & node.right == null) {
+    // if (!dir)
+    // parentNode.left = node.left;
+    // else
+    // parentNode.right = node.left;
+    // }
+    // // If node has only right child
+    // else if (node.left == null & node.right != null) {
+    // if (!dir)
+    // parentNode.left = node.right;
+    // else
+    // parentNode.right = node.right;
+    // }
+    // // Else the node has two children
+    // else {
+    // if (!deleteDir) {
+    // BstElement max = maxElement(node.left);
+    // node.data = max.data;
+    // node.frequency = max.frequency;
+    // deleteRecursive(max.data, node.left, node, false);
+    // deleteDir = !deleteDir;
+    // } else {
+    // BstElement min = minElement(node.right);
+    // node.data = min.data;
+    // node.frequency = min.frequency;
+    // deleteRecursive(min.data, node.right, node, false);
+    // deleteDir = !deleteDir;
+    // }
+    // }
+    // return true;
+    // } else if (key < node.data) {
+    // return deleteRecursive(key, node.left, node, false);
+    // } else if (key > node.data) {
+    // return deleteRecursive(key, node.right, node, true);
+    // } else
+    // return false;
+    // }
+
+    public boolean delete(int key, BstElement node, BstElement parent) {
+        comparisons++;
         if (key == node.data) {
-            if (!deleted) {
-                System.out.println("true");
-            }
-            deleted = true;
-
-            if (--node.frequency != 0) {
-                return;
+            if (node.frequency > 1) {
+                node.frequency--;
+                return true;
             }
 
-            if (node == root) {
-                BstElement max;
-                if(node.left == null && node.right == null) {
-                    root = null;
-                    return;
-                }
-                else if (node.left != null) {
-                    max = maxElement(node.left);
-                    node.data = max.data;
-                    node.frequency = max.frequency;
-                    deleteRecursive(max.data, node.left, node, false);
-                    return;
-                } else {
-                    BstElement min = minElement(node.right);
-                    node.data = min.data;
-                    node.frequency = min.frequency;
-                    deleteRecursive(min.data, node.right, node, true);
-                    return;
-                }
+            switch (getChildrenCount(node)) {
+                case 0:
+                    setParent(key, parent, null);
+                    break;
+
+                case 1:
+                    setParent(key, parent, (node.right != null ? node.right : node.left));
+                    break;
+
+                case 2:
+                    if (deleteDir == false) {
+                        BstElement maxElParent = maxElement(node.left, node);
+
+                        if (maxElParent == node) {
+                            node.left.right = node.right;
+                            setParent(key, parent, maxElParent.left);
+                        } else {
+                            node.data = maxElParent.right.data;
+                            node.frequency = maxElParent.right.frequency;
+
+                            maxElParent.right = maxElParent.right.left;
+                        }
+
+                        deleteDir = true;
+                    } else {
+
+                        BstElement maxElParent = minElement(node.right, node);
+                        if (maxElParent == node) {
+                            node.right.left = node.left;
+                            setParent(key, parent, maxElParent.right);
+                        } else {
+                            node.data = maxElParent.left.data;
+                            node.frequency = maxElParent.left.frequency;
+
+                            maxElParent.left = maxElParent.left.right;
+                        }
+                        deleteDir = false;
+                    }
             }
-            // If node is a leaf
-            else if (node.left == null & node.right == null) {
-                if(!dir)
-                    parentNode.left = null;
-                else 
-                    parentNode.right = null;
-            }
-            // If node has only left child
-            else if (node.left != null & node.right == null) {
-                if(!dir)
-                    parentNode.left = node.left;
-                else 
-                    parentNode.right = node.left;
-            }
-            // If node has only right child
-            else if (node.left == null & node.right != null) {
-                if(!dir)
-                    parentNode.left = node.right;
-                else 
-                    parentNode.right = node.right;
-            }
-            // Else the node has two children
-            else {
-                BstElement max = maxElement(node.left);
-                node.data = max.data;
-                node.frequency = max.frequency;
-                deleteRecursive(max.data, node.left, node, false);
-            }
-        } else if (key < node.data) {
-            deleteRecursive(key, node.left, node, false);
-        } else if (key > node.data) {
-            deleteRecursive(key, node.right, node, true);
+            return true;
+
+        } else if (key < node.data && node.left != null) {
+            return delete(key, node.left, node);
+        } else if (key > node.data && node.right != null) {
+            return delete(key, node.right, node);
+        } else {
+            return false;
         }
     }
 
-    private BstElement maxElement(BstElement node) {
-        if (node.right == null)
-            return node;
-        return maxElement(node.right);
+    private void setParent(int key, BstElement parent, BstElement newNode) {
+        if (parent == null) {
+            root = newNode;
+        } else {
+            if (key > parent.data) {
+                parent.right = newNode;
+            } else {
+                parent.left = newNode;
+            }
+        }
     }
 
-    public BstElement minElement(BstElement node) {
-        if(node.left != null) 
-            return node;
-        return minElement(node.left);
+    public int getChildrenCount(BstElement node) {
+        int i = 0;
+        if (node.left != null)
+            i++;
+
+        if (node.right != null)
+            i++;
+
+        return i;
+    }
+
+    private BstElement maxElement(BstElement node, BstElement parent) {
+        if (node.right == null)
+            return parent;
+        return maxElement(node.right, node);
+    }
+
+    public BstElement minElement(BstElement node, BstElement parent) {
+        if (node.left == null)
+            return parent;
+        return minElement(node.left, node);
     }
 
     private void preOrder(BstElement node) {
@@ -230,6 +311,7 @@ class BstElement {
     public BstElement(int x) {
         data = x;
         frequency = 1;
-        left = right = null;
+        left = null;
+        right = null;
     }
 }
